@@ -35,8 +35,15 @@ int romanToArabic(char *str)
 			amount_char = 1;
 		}
 		else if(last_value < cur_value) {
+			if(last_value * 10 < cur_value)
+				return -1;
+			else if(last_value == SNC_ROMAN_V ||
+					last_value == SNC_ROMAN_L || last_value == SNC_ROMAN_D)
+				return -1;
+			
 			answer += cur_value - 2 * last_value;
-			if(amount_char > 1) return -1;
+			if(amount_char > 1)
+				return -1;
 			amount_char = 1;
 		}
 		last_value = cur_value;
