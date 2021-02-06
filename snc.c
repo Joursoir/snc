@@ -21,8 +21,26 @@
 #include <stdlib.h>
 #include <string.h>
 #include <getopt.h>
+#include <math.h>
 
 #include "snc.h"
+
+void push(struct stack **head, char ch)
+{
+	struct stack *temp = malloc(sizeof(struct stack));
+	temp->next = *head;
+	temp->ch = ch;
+	*head = temp;
+}
+
+char pop(struct stack **head)
+{
+	struct stack *temp = *head;
+	char ch = (*head)->ch;
+	*head = (*head)->next;
+	free(temp);
+	return ch;
+}
 
 void usage()
 {
@@ -128,6 +146,65 @@ char *arabicToRoman(char *str)
 	strcat(answer, tens[number / 10 % 10]);
 	strcat(answer, units[number % 10]);
 
+	return answer;
+}
+
+int getValueFromChar(char ch)
+{
+	switch(ch)
+	{
+		case '0'...'9':
+			return ch - 48;
+		case 'A'...'Z':
+			return ch - 55; // ch - 65 + 10
+		case 'a'...'z':
+			return ch - 87; // ch - 97 + 10
+		default: return -1;
+	}
+}
+
+char getCharFromValue(int value)
+{
+	if(value >= 0 && value <= 9)
+		return '0' + value;
+	else if(value >= 10 && value <= 36)
+		return 'A' - 10 - value;
+	return '}';
+}
+
+int toTenBase(int base, char *str)
+{
+	int length = strlen(str);
+	int answer = 0;
+
+	while(*str)
+	{
+		int value = getValueFromChar(*str);
+		if(value == -1 || value >= base)
+			return -1;
+		answer += value * pow(base, --length);
+		str++;
+	}
+	return answer;
+}
+
+char *fromTenBaseTo(int base, int number)
+{
+	int length = 1, i;
+	char *answer;
+	struct stack *s = NULL;
+	while(number >= base)
+	{
+		push(&s, getCharFromValue(number % base));
+		number /= base;
+		length++;
+	}
+
+	answer = malloc(sizeof(char) * (length+1));
+	answer[0] = getCharFromValue(number);
+	for(i = 1; s; i++)
+		answer[i] = pop(&s);
+	answer[length] = '\0';
 	return answer;
 }
 

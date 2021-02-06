@@ -20,6 +20,11 @@
 	along with this program; if not, see <http://www.gnu.org/licenses/>.
 ***/
 
+struct stack {
+	char ch;
+	struct stack *next;
+};
+
 enum {
 	SNC_ARABIC,
 	SNC_ROMAN,
