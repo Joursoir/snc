@@ -20,8 +20,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 
 #include "snc.h"
+
+void usage()
+{
+	printf("Simple numbers converter\n"
+			"\n"
+			"Synopsis: snc [OPTION] ... [NUMBER]\n"
+			"Option:\n"
+			"\t-h, --help\n"
+			"\t\tPrint this text.\n"
+			"\t-i, --input\n"
+			"\t\t****\n"
+			"\t-o, --output\n"
+			"\t\t****\n"
+			"\t-a, --alphabet\n"
+			"\t\t****\n"
+			"\t-A, --list-alphabets\n"
+			"\t\t****\n");
+}
 
 int getRomanValue(char symbol)
 {
@@ -107,14 +126,44 @@ char *arabicToRoman(char *str)
 
 int main(int argc, char *argv[])
 {
-	if(argc < 2)
-		return printf("Simple numbers converter\n"
-					"\n"
-					"Synopsis: snc [number]\n");
+	if(argc == 1) {
+		usage();
+		return 0;
+	}
 
-	int answer = romanToArabic(argv[1]);
-	if(answer == -1) printf("ERROR! %s is not roman number\n", argv[1]);
-	else printf("answer: %d\n", answer);
+	int result;
+	const char short_options[] = "hi:o:a:A";
+	const struct option long_options[] = {
+		{"help", no_argument, NULL, 'h'},
+		{"input", required_argument, NULL, 'i'},
+		{"output", required_argument, NULL, 'o'},
+		{"alphabet", required_argument, NULL, 'a'},
+		{"list-alphabets", required_argument, NULL, 'A'},
+		{NULL, 0, NULL, 0}
+	};
+
+	while((result = getopt_long(argc, argv, short_options,
+		long_options, NULL)) != -1) {
+		switch(result) {
+		case 'h': {
+			usage();
+			return 0;
+		}
+		case 'i': {
+			break;
+		}
+		case 'o': {
+			break;
+		}
+		case 'a': {
+			break;
+		}
+		case 'A': {
+			break;
+		}
+		default: break;
+		}
+	}
 
 	return 0;
 }
