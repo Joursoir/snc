@@ -21,6 +21,8 @@
 ***/
 
 enum {
+	SNC_ARABIC,
+	SNC_ROMAN,
 	SNC_ROMAN_I = 1,
 	SNC_ROMAN_V = 5,
 	SNC_ROMAN_X = 10,
