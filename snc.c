@@ -18,6 +18,8 @@
 ***/
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "snc.h"
 
@@ -76,6 +78,29 @@ int romanToArabic(char *str)
 
 		str++;
 	}
+
+	return answer;
+}
+
+char *arabicToRoman(char *str)
+{
+	int number = atoi(str);
+	if(!number || number > SNC_ROMAN_MAX_NUMBER)
+		return NULL;
+
+	const char *units[] = {"","I","II","III","IV",
+							"V","VI","VII","VIII","IV"};
+	const char *tens[] = {"","X","XX","XXX","XL",
+							"L","LX","LXX","LXXX","XC"};
+	const char *hundreds[] = {"","C","CC","CCC","CD",
+							"D","DC","DCC","DCCC","CM"};
+	const char *thousands[] = {"","M","MM","MMM"};
+	char *answer = malloc(sizeof(char) * (SNC_ROMAN_MAXLEN + 1));
+
+	strcpy(answer, thousands[number / 1000]);
+	strcat(answer, hundreds[number / 100 % 10]);
+	strcat(answer, tens[number / 10 % 10]);
+	strcat(answer, units[number % 10]);
 
 	return answer;
 }
