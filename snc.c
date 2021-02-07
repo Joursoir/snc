@@ -215,7 +215,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	int result;
+	int opt;
 	const char short_options[] = "hi:o:a:A";
 	const struct option long_options[] = {
 		{"help", no_argument, NULL, 'h'},
@@ -228,20 +228,30 @@ int main(int argc, char *argv[])
 
 	int convert_from;
 	int convert_to = SNC_ARABIC;
-	//int input_base = 10;
-	//int output_base = 10;
+	int input_base = 10;
+	int output_base = 10;
 
-	while((result = getopt_long(argc, argv, short_options,
+	while((opt = getopt_long(argc, argv, short_options,
 		long_options, NULL)) != -1) {
-		switch(result) {
+		switch(opt) {
 		case 'h': {
 			usage();
 			return 0;
 		}
 		case 'i': {
+			input_base = atoi(optarg);
+			if(input_base == 0) {
+				printf("Uncorrect input base\n");
+				return 1;
+			}
 			break;
 		}
 		case 'o': {
+			output_base = atoi(optarg);
+			if(output_base == 0) {
+				printf("Uncorrect output base\n");
+				return 1;
+			}
 			break;
 		}
 		case 'a': {
@@ -269,32 +279,59 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	if(atoi(argv[optind]) == 0)
-		convert_from = SNC_ROMAN;
-	else
-		convert_from = SNC_ARABIC;
+	if(convert_to == SNC_ROMAN && output_base != 10) {
+		printf("Roman alphabet support only ten base\n");
+		return 1;
+	}
 
-	if(convert_to != convert_from) {
-		if(convert_to == SNC_ROMAN) {
-			char *answer = arabicToRoman(str_number);
-			if(!answer) {
-				printf("%s is not correct arabic number.\n", str_number);
-				return 1;
-			}
-			printf("%s\n", answer);
-			free(answer);
-		}
-		else {
-			int answer = romanToArabic(str_number);
-			if(answer == -1) {
-				printf("%s is not correct roman number.\n", str_number);
-				return 1;
-			}
-			printf("%d\n", answer);
+	if(atoi(str_number))
+		convert_from = SNC_ARABIC;
+	else {
+		convert_from = SNC_ROMAN;
+		if(input_base != 10) {
+			printf("Roman alphabet support only ten base\n");
+			return 1;
 		}
 	}
+
+	char *str_arabic = str_number;
+	char *str_tenbase;
+	char *str_roman;
+	int tb_number;
+
+	if(convert_to != convert_from && convert_from == SNC_ROMAN) {
+		int temp = romanToArabic(str_number);
+		if(temp == -1) {
+			printf("%s is not correct roman number.\n", str_number);
+			return 1;
+		}
+		str_arabic = malloc(sizeof(char) * (4+1)); // how define 4?
+		sprintf(str_arabic, "%d", temp);
+	}
+
+	tb_number = toTenBase(input_base, str_arabic);
+	if(str_arabic != str_number)
+			free(str_arabic);
+	if(tb_number == -1) {
+		printf("%s contains not valid chars for %d base system.\n",
+			str_number, input_base);
+		return 1;
+	}
+
+	str_tenbase = fromTenBaseTo(output_base, tb_number);
+	if(convert_to != convert_from && convert_from == SNC_ARABIC) {
+		str_roman = arabicToRoman(str_tenbase);
+		free(str_tenbase);
+		if(!str_roman) {
+			printf("%s is not correct arabic number.\n", str_roman);
+			return 1;
+		}
+		printf("%s\n", str_roman);
+		free(str_roman);
+	}
 	else {
-		printf("%s\n", str_number);
+		printf("%s\n", str_tenbase);
+		free(str_tenbase);
 	}
 
 	return 0;
